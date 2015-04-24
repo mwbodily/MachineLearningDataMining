@@ -1,0 +1,17 @@
+GitHub Reference
+
+clone a repository: 
+	cd into the correct file
+	use the command:
+		git clone https//...yourLink.com
+
+Pushing a file:
+	git add <your file>.extension
+	git commit -m "your comment"
+	git push
+
+See the status (difference between your version and the one on gitHub):
+	git status
+
+Getting a file:
+	git pull
