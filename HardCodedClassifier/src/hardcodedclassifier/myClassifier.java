@@ -5,7 +5,11 @@
  */
 package hardcodedclassifier;
 
+import weka.classifiers.*;
+import weka.core.*;
+
 import weka.classifiers.Classifier;
+//import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.core.Attribute;
@@ -13,27 +17,25 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
-
 /**
  *
  * @author Mackenzie
  */
-public class HardCodedClassifier {
-
-    /**
-     * Currently, no command line parameters are needed in this
-     * program. 
-     */
-    public static void main(String[] args) throws Exception{
-        try{
-            basicClassifier basic = new basicClassifier();
-        }
-        catch (Exception tempHandler)
-        {
-            System.out.println("Error! " + tempHandler);
-        }
+public class myClassifier extends Classifier
+{
+    private int test;
+    private Instances inst;
+    public myClassifier()
+    {
         
-        System.out.println("Program Complete.\n");
     }
+
+    @Override
+    public void buildClassifier(Instances i) throws Exception {
+        inst = i;
+        //throw new UnsupportedOperationException("Not supported yet."); 
+        
+    }
+   
     
 }
