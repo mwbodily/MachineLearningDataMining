@@ -126,11 +126,7 @@ public class RunClassifier {
         splitTrainAndTest();
         
         // Classify the data
-        classifyData();
-        
-        //output the results
-        outputResults();
-        
+        classifyData();        
     }
     
     /********************************************************************

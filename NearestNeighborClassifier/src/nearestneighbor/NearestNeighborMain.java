@@ -25,8 +25,9 @@ public class NearestNeighborMain {
      */
     public static void main(String[] args) {
         try{
-            RunClassifier basic = new RunClassifier();
-            basic.classify();
+            RunClassifier kNN = new RunClassifier();
+            kNN.classify();
+            kNN.outputResults();
         }
         catch (Exception er)
         {
