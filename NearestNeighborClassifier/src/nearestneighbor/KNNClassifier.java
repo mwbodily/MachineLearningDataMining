@@ -46,7 +46,8 @@ public class KNNClassifier extends Classifier{
      * aren't bothering to implement the square root function. Since we are
      * only looking for a general number and we are using the same 
      * measure for all points it will not effect the results of the
-     * program. 
+     * program. The power of two must stay to account for negative
+     * numbers.
      * 
      * This program takes two parameters and returns the distance between
      * them. Using the Euclidean distance formula as follows:
@@ -62,12 +63,8 @@ public class KNNClassifier extends Classifier{
         int numAttributes = a.numAttributes();
         double distance = 0;
                 
-       // System.out.println("A: " + a);
-       // System.out.println("B: " + b);
         for(int i = 0; i < (numAttributes - 1); i++)
         {
-            //System.out.println(a.value + " - " + b.value())
-            //do I really need to implement the ^2???
             distance += Math.pow((a.value(i) - b.value(i)), 2);
         }
 
@@ -113,12 +110,7 @@ public class KNNClassifier extends Classifier{
                 closestNeighbor = i;
                 currentBest = tempDistance;
             }
-            //System.out.println(tempDistance + " " + i + " " + currentBest + "\n");
         }
-        
-        //System.out.println("Final Results: " + currentBest + " " + closestNeighbor);
-        
-        //System.out.println("That means we think it's: " + (dataSet.instance(closestNeighbor)).value(4));
         
         return (dataSet.instance(closestNeighbor)).value(4);   
     }
