@@ -22,12 +22,12 @@ import java.util.Random;
  * @author Mackenzie Bodily
  */
 public class RunClassifier {    
-    DataSource source;
-    Instances data;
-    Instances training;
-    Instances testing;
-    Instances validation; //not currently in use, but included for future uses
-    Evaluation trainingEval;
+    private DataSource source;
+    private Instances data;
+    private Instances training;
+    private Instances testing;
+    private Instances validation; //not currently used, to be used in the future
+    private Evaluation trainingEval;
     
    /********************************************************************
     * Default constructor. Automatically sets the data to that contained in 
@@ -134,9 +134,29 @@ public class RunClassifier {
     }
     
     /********************************************************************
+     * This version of classify takes the size of the training data and
+     * the size of the testing data as parameters. This allows the user
+     * the option of not selecting the default values.
+     ********************************************************************/
+    public void classify(int trainSize, int testSize) throws Exception
+    {
+        //randomize the data
+        data.randomize(new Random(0));    
+
+        //divide the data into training and testing groups.
+        splitTrainAndTest(trainSize, testSize);
+        
+        // Classify the data
+        classifyData();
+        
+        //output the results
+        outputResults();
+    }
+    
+    /********************************************************************
      * Outputs the results of the classification.
      ********************************************************************/
-    public void outputResults()//Evaluation eval)
+    public void outputResults()
     {
         System.out.println(trainingEval.toSummaryString("\nResults\n-----------\n", 
                 false));
