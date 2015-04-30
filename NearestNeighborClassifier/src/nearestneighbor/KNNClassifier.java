@@ -19,14 +19,16 @@ import weka.core.converters.ConverterUtils.DataSource;
  * @author Mackenzie
  */
 public class KNNClassifier extends Classifier{
-    private int iter;
     private Instances dataSet;
+    private int k;
+
     /*******************************************************************
      * Default constructor, currently empty. 
+     * @param k = number of neighbors to search for
      ********************************************************************/
-    public KNNClassifier()
+    public KNNClassifier(int kVal)
     {
-        iter = 0;
+        k = kVal;
     }
     
     /********************************************************************
@@ -35,9 +37,6 @@ public class KNNClassifier extends Classifier{
      ********************************************************************/
     @Override
     public void buildClassifier(Instances i) throws Exception {
-        //This is only called once. So You need to figure out a
-        //way so that the data is still stored... As it is, I don't
-        //think it's being stored...
         dataSet = i;
     }
    
@@ -60,14 +59,14 @@ public class KNNClassifier extends Classifier{
      ********************************************************************/
     public double distanceEuclid(Instance a, Instance b)
     {
-        int numAttributes = a.numAttributes();
+        int numAttributes = (a.numAttributes() - 1);
         double distance = 0;
-                
-        for(int i = 0; i < (numAttributes - 1); i++)
-        {
-            distance += Math.pow((a.value(i) - b.value(i)), 2);
-        }
 
+        for(int i = 0; i < (numAttributes); i++)
+        {
+            distance += Math.pow(a.value(i) - b.value(i), 2);
+            
+        }
         return distance;
     }
     
@@ -81,9 +80,17 @@ public class KNNClassifier extends Classifier{
      * @param a - point a
      * @param b = point b
      ********************************************************************/
-    public void distanceManhattan(Instance a, Instance b)
+    public double distanceManhattan(Instance a, Instance b)
     {
-        
+        int numAttributes = (a.numAttributes() - 1);
+        double distance = 0;
+                
+        for(int i = 0; i < (numAttributes); i++)
+        {
+            distance += Math.abs(a.value(i) - b.value(i));
+        }
+
+        return distance;
     }
     
     //TODO: allow the user to specify any k that they want. For now
@@ -93,6 +100,7 @@ public class KNNClassifier extends Classifier{
      * the first instance. 
      * 
      * @param inst
+     * @return double - the correct classification.
      * @throws java.lang.Exception
      ********************************************************************/
     @Override

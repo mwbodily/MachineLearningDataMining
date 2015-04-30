@@ -17,6 +17,9 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import java.util.Random;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Normalize;
+import weka.filters.unsupervised.attribute.Standardize;
 
 /**
  * @author Mackenzie Bodily
@@ -83,6 +86,7 @@ public class RunClassifier {
         //copy after the second, NOT the number element in data.
         training = new Instances(data, 0, trainSize);
         testing = new Instances(data, trainSize, testSize);
+        
     }
     
     /********************************************************************
@@ -91,9 +95,10 @@ public class RunClassifier {
      ********************************************************************/
     public void splitTrainAndTest(int trainSize, int testSize)
     {
+        //note that the 3rd variable is the number of items to 
+        //copy after the second, NOT the number element in data.
         training = new Instances(data, 0, trainSize);
         testing = new Instances(data, trainSize, testSize);
-    
     }
     
    /********************************************************************
@@ -105,11 +110,22 @@ public class RunClassifier {
         //Run the classifier (a Naive Bayes is included for reference).
         //Classifier classy = (Classifier)new NaiveBayes();
         KNNClassifier classy = new KNNClassifier();
-        classy.buildClassifier(data);
+        classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
         trainingEval.evaluateModel(classy, testing);
     }
     
+    /********************************************************************
+    * Uses the Standardize filter to standardize the data for more 
+    * reliable results.
+    ********************************************************************/
+    public void standardizeSets() throws Exception
+    {
+        Standardize filter = new Standardize();
+        filter.setInputFormat(training);
+        training = Filter.useFilter(training, filter);
+        testing = Filter.useFilter(testing, filter);
+    }
     /********************************************************************
      * Calls the classifier functions to get the classifier started. This
      * is the default version of the class that uses the Iris CSV provided 
@@ -121,9 +137,12 @@ public class RunClassifier {
     {        
         //randomize the data
         data.randomize(new Random(0));    
-
+        
         //divide the data into training and testing groups.
         splitTrainAndTest();
+        
+        //standardize the data
+        standardizeSets();
         
         // Classify the data
         classifyData();        
@@ -142,11 +161,11 @@ public class RunClassifier {
         //divide the data into training and testing groups.
         splitTrainAndTest(trainSize, testSize);
         
+        //standardize the data
+        standardizeSets();
+        
         // Classify the data
         classifyData();
-        
-        //output the results
-        outputResults();
     }
     
     /********************************************************************
