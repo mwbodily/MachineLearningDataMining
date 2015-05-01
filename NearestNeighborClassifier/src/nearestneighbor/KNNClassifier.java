@@ -1,37 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This class implements a KNN classification algorithm. It utilizes the weka
+ * library 
  */
 package nearestneighbor;
 
 import java.util.ArrayList;
 import java.util.List;
 import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.core.Attribute;
-import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 
 /**
- *
- * @author Mackenzie
+ * @author Mackenzie Bodily
  */
-
-
 
 public class KNNClassifier extends Classifier{
     private Instances dataSet;
-    private int k;
+    private final int k;
 
-
-    
     /*******************************************************************
      * Default constructor, currently empty. 
-     * @param k = number of neighbors to search for
+     * @param kVal = number of neighbors to search for
      ********************************************************************/
     public KNNClassifier(int kVal)
     {
@@ -58,18 +47,18 @@ public class KNNClassifier extends Classifier{
      * This program takes two parameters and returns the distance between
      * them. Using the Euclidean distance formula as follows:
      * 
-     *  [insert formula]
+     *  D = sqrt((a1 - a2)^2 + (b1 - b2)^2 + (c1 - c2)^2 + ...)
      * 
      * @param a - point a
      * @param b - point b
      * @return - Euclidean distance between two points
      ********************************************************************/
-    public double distanceEuclid(Instance a, Instance b)
+    private double distanceEuclid(Instance a, Instance b)
     {
         int numAttributes = (a.numAttributes() - 1);
         double distance = 0;
 
-        for(int i = 0; i < (numAttributes); i++)
+        for(int i = 0; i < numAttributes; i++)
         {
             distance += Math.pow(a.value(i) - b.value(i), 2);
             
@@ -81,18 +70,18 @@ public class KNNClassifier extends Classifier{
      * This function finds the Manhattan distance between two points 
      * according to the following formula:
      * 
-     *  [insert formula]
+     *  D = |(a1 - a2)| + |(b1 - b2)| + |(c1 - c2)| + |...|
      * 
      * It requires two instances to find the distance between.
      * @param a - point a
      * @param b = point b
      ********************************************************************/
-    public double distanceManhattan(Instance a, Instance b)
+    private double distanceManhattan(Instance a, Instance b)
     {
         int numAttributes = (a.numAttributes() - 1);
         double distance = 0;
                 
-        for(int i = 0; i < (numAttributes); i++)
+        for(int i = 0; i < numAttributes; i++)
         {
             distance += Math.abs(a.value(i) - b.value(i));
         }
@@ -100,6 +89,13 @@ public class KNNClassifier extends Classifier{
         return distance;
     }
     
+    /********************************************************************
+     * Initializes a list to contain k Neighbors. These neighbors are 
+     * later used to determine which value to guess when determining
+     * the value of the testing instances.
+     * 
+     * @return 
+     ********************************************************************/
     private List initializeNeighbors()
     {
         List neighbors = new ArrayList();
@@ -113,13 +109,20 @@ public class KNNClassifier extends Classifier{
         return neighbors;
     }
     
-    public Neighbor findNewHighest(List neighbors)
+    /********************************************************************
+     * Finds the neighbor with the highest distance from the instance
+     * being tested and returns that value.
+     * 
+     * @param neighbors - list of neighbors to find the highest of.
+     * @return 
+     ********************************************************************/
+    private Neighbor findNewHighest(List neighbors)
     {
         Neighbor highest;
         highest = (Neighbor)neighbors.get(0);
         Neighbor temp;
         
-        for(int i = 1; i < k; i++)
+        for(int i = 0; i < k; i++)
         {
             temp = (Neighbor)neighbors.get(i);
             if(temp.distance > highest.distance)
@@ -132,39 +135,55 @@ public class KNNClassifier extends Classifier{
         
     }
     
-    public double makeGuess(List neighbors)
+    /*********************************************************************
+     * Creates a list with as many nodes as there are possible classes.
+     * The frequency of each class among each of the nearest neighbors
+     * (contained in the neighbors list) is then taken. The list with
+     * these values is then passed so a guess can be made based on these
+     * frequencies.
+     * 
+     * @param neighbors - the k nearest neighbors
+     * @return 
+     ********************************************************************/
+    private List createFrequencyList(List neighbors)
     {
-        //System.out.println("Result Size: " + neighbors.size());
-        //System.out.println("NumClasses: " + dataSet.numClasses());
-        List<Integer> results = new ArrayList<Integer>();
+        List<Integer> results = new ArrayList<>();
+        int current;
+        Neighbor temp;
+        
         for(int i = 0; i <= dataSet.numClasses(); i++)
         {
             results.add(0);
         }
         
-        Neighbor temp =(Neighbor)neighbors.get(0);
-        //System.out.println("test: " + dataSet.instance(temp.index).attribute(0));
-        int value;
-        
         for(int i = 0; i < neighbors.size(); i++)
         {
-            Neighbor item = (Neighbor) neighbors.get(i);
-            int theIndex = item.index;
+            temp = (Neighbor) neighbors.get(i);
             
-            //gets the current value in that node.
-            int current = results.get((int)dataSet.instance(item.index).classValue());
+            //gets the current value in that node and increments it.
+            current = results.get((int)dataSet.instance(temp.index).classValue());
             current += 1;
-            results.set((int)dataSet.instance(item.index).classValue(), current);
-         
+            results.set((int)dataSet.instance(temp.index).classValue(), current);
         }
         
-        System.out.println("testing...");
-        for(int i : results)
-        {
-            System.out.println("::: " + i);
-        }
-        
+        return results;
+    }
+    
+    /********************************************************************
+     * Uses the frequency of each class among the k nearest neighbors 
+     * to guess a class. The class with the highest frequency is selected
+     * and, if there is a tie, the first one with that frequency is 
+     * selected. TODO: implement a better tie breaker algorithm based on
+     * neighbor weights.
+     * 
+     * @param neighbors
+     * @return 
+     ********************************************************************/
+    private double makeGuess(List neighbors)
+    {
+        List<Integer> results = createFrequencyList(neighbors);
         int highest = 0;
+       
         for(int i =  0; i < results.size(); i++)
         {
             if(results.get(i) > results.get(highest))
@@ -172,11 +191,9 @@ public class KNNClassifier extends Classifier{
                 highest = i;
             }
         }
-        //System.out.println("highest: " + highest);
         return highest;
     }
-    //TODO: allow the user to specify any k that they want. For now
-    // k can only equal 1.
+
     /********************************************************************
      * Classifies the instance passed to it. Currently, this just returns
      * the first instance. 
@@ -188,7 +205,7 @@ public class KNNClassifier extends Classifier{
     @Override
     public double classifyInstance(Instance inst) throws Exception
     {
-        //System.out.println("does?");
+        
         List neighbors = new ArrayList();
         
         for(int i = 0; i < k; i++)
@@ -196,52 +213,24 @@ public class KNNClassifier extends Classifier{
             Neighbor temp = new Neighbor();
             neighbors.add(temp);
         }
-        //System.out.println("does 2?");
-        //List neighbors = initializeNeighbors();
+
         Neighbor max = (Neighbor) neighbors.get(0);
-        int highest = 1;
         double tempDistance;
-        //System.out.println("does 3?");
+
         for(int i = 0; i < dataSet.numInstances(); i++)
         {
             tempDistance = distanceEuclid(inst, dataSet.instance(i));
-           // System.out.println("does 4?");
+ 
             if(tempDistance < max.distance)
             {
-                //System.out.println("does 5?");
                 Neighbor temp = new Neighbor(i, tempDistance);
-                max = findNewHighest(neighbors);
-                //System.out.println("does 6?");
                 neighbors.remove(max);
                 neighbors.add(temp);
+                max = findNewHighest(neighbors);
+
             }
         }
-        System.out.println("making guess...");
-        return makeGuess(neighbors);
-        //return makeGuess(neighbors);
-        //Neighbor currentHighest = neighbors.get(0);
-       /* double tempDistance;
-        
-        for(int i = 0; i < dataSet.numInstances(); i++)
-        {
-            if (k == 1)
-            {
-                tempDistance = distanceEuclid(inst, dataSet.instance(i));
-                if(tempDistance < currentHighest.getDistance())
-                {   
-                    closestNeighbor = i;
-                    currentHighest = tempDistance;
-               }   
-            }
-            else
-            {
-                tempDistance = distanceEuclid(inst, dataSet.instance(i));
-                if(tempDistance < neighbors.get(highest).getDistance())
-                {
-                    
-                }
-            }*/
-        
-        //return 0;//(dataSet.instance(closestNeighbor)).value(4);   
+       
+        return makeGuess(neighbors);       
     }
 }
