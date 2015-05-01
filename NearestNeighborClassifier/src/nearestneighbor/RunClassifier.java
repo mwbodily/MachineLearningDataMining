@@ -109,7 +109,7 @@ public class RunClassifier {
     {
         //Run the classifier (a Naive Bayes is included for reference).
         //Classifier classy = (Classifier)new NaiveBayes();
-        KNNClassifier classy = new KNNClassifier();
+        KNNClassifier classy = new KNNClassifier(2);
         classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
         trainingEval.evaluateModel(classy, testing);

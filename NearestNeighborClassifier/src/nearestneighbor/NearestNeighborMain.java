@@ -31,7 +31,7 @@ public class NearestNeighborMain {
         }
         catch (Exception er)
         {
-            System.out.println("Error! " + er);
+            System.out.println("Error T! " + er);
         }
         
         System.out.println("Program Complete.\n");
