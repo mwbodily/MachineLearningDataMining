@@ -70,7 +70,7 @@ public class KNNClassifier extends Classifier{
      * This function finds the Manhattan distance between two points 
      * according to the following formula:
      * 
-     *  D = |(a1 - a2)| + |(b1 - b2)| + |(c1 - c2)| + |...|
+     *  D = |(a1 - a2)| + |(b1 - b2)| + |(c1 - c2)| + ... + |...|
      * 
      * It requires two instances to find the distance between.
      * @param a - point a
@@ -78,14 +78,17 @@ public class KNNClassifier extends Classifier{
      ********************************************************************/
     private double distanceManhattan(Instance a, Instance b)
     {
+        //System.out.println("A: " + a + "\nB: " + b + "\n");
         int numAttributes = (a.numAttributes() - 1);
         double distance = 0;
                 
         for(int i = 0; i < numAttributes; i++)
         {
+            //System.out.println(a.value(i) + " - " + b.value(i) + " = " + (a.value(i)-b.value(i)));
             distance += Math.abs(a.value(i) - b.value(i));
         }
 
+        //System.out.println("\n\n");
         return distance;
     }
     
@@ -173,18 +176,21 @@ public class KNNClassifier extends Classifier{
      * Uses the frequency of each class among the k nearest neighbors 
      * to guess a class. The class with the highest frequency is selected
      * and, if there is a tie, the first one with that frequency is 
-     * selected. TODO: implement a better tie breaker algorithm based on
-     * neighbor weights.
+     * selected. 
+     * 
+     * Note: This is the simple guesser. If a tie is encountered, it will
+     * just select the first class that had that value. For a better 
+     * tie breaking scheme, see makeGuessWeighted.
      * 
      * @param neighbors
      * @return 
      ********************************************************************/
-    private double makeGuess(List neighbors)
+    private double makeGuessSimple(List neighbors)
     {
         List<Integer> results = createFrequencyList(neighbors);
         int highest = 0;
        
-        for(int i =  0; i < results.size(); i++)
+        for(int i =  1; i < results.size(); i++)
         {
             if(results.get(i) > results.get(highest))
             {
@@ -193,7 +199,79 @@ public class KNNClassifier extends Classifier{
         }
         return highest;
     }
+   /********************************************************************
+    * Goes through the neighbors list and adds up the distances between
+    * the nodes of both types of classes. The class with the lowest sum
+    * is returned as the match.
+    * 
+    * @param highest - one of the classes that is being compared
+    * @param i - another of the classes that is being compared
+    * @param neighbors - a list of the k closest neighbors to the point
+    *                    we are trying to guess
+    * 
+    * @return 
+    ********************************************************************/
+    private int breakTieByWeight(List neighbors, int highest, int challenger)
+    {
+        Neighbor temp;
+        double highestDistance = 0;
+        double challengerDistance = 0;
+        
+        //find the neighbors with those classes and sum those distances
+        for (int it = 0; it < neighbors.size(); it++)
+        {
+            temp = (Neighbor) neighbors.get(it);
+            if(dataSet.instance(temp.index).classValue() == highest)
+            {
+                highestDistance += temp.distance;
+            }
+            else if(dataSet.instance(temp.index).classValue() == challenger)
+            {
+                challengerDistance += temp.distance;
+            }
+        }
 
+       //return the lowest distance
+        if(highestDistance > challengerDistance)
+        {
+            return highest;
+        }
+        
+        return challenger;
+    }
+    
+    /********************************************************************
+     * Uses the frequency of each class among the k nearest neighbors 
+     * to guess a class. The class with the highest frequency is selected
+     * and, if there is a tie, the first one with that frequency is 
+     * selected. 
+     * 
+     * Note: This class uses weights to break ties. If two classes
+     * have the same frequency, the class with the two closest values
+     * will be selected. For a more arbitrary method, see makeGuessSimple.
+     * 
+     * @param neighbors
+     * @return 
+     ********************************************************************/
+    private double makeGuessWeighted(List neighbors)
+    {
+        List<Integer> results = createFrequencyList(neighbors);
+        int highest = 0;
+       
+        for(int i =  1; i < results.size(); i++)
+        {
+            if(results.get(i) > results.get(highest))
+            {
+                highest = i;
+            }
+            else if((results.get(i) == results.get(highest)) && highest != 0)
+            {          
+                highest = breakTieByWeight(neighbors, highest, i);
+            }
+        }
+        return highest;
+    }
+    
     /********************************************************************
      * Classifies the instance passed to it. Currently, this just returns
      * the first instance. 
@@ -218,19 +296,20 @@ public class KNNClassifier extends Classifier{
         double tempDistance;
 
         for(int i = 0; i < dataSet.numInstances(); i++)
-        {
-            tempDistance = distanceEuclid(inst, dataSet.instance(i));
- 
+        {          
+            tempDistance = distanceManhattan(inst, dataSet.instance(i));
+
             if(tempDistance < max.distance)
             {
                 Neighbor temp = new Neighbor(i, tempDistance);
                 neighbors.remove(max);
                 neighbors.add(temp);
                 max = findNewHighest(neighbors);
-
             }
         }
        
-        return makeGuess(neighbors);       
+        //make a guess based on one of the two options...
+        //return makeGuessSimple(neighbors);
+        return makeGuessWeighted(neighbors);       
     }
 }

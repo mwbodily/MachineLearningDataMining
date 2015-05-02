@@ -19,7 +19,11 @@ public class NearestNeighborMain {
      ********************************************************************/
     public static void main(String[] args) {
         try{
-            RunClassifier kNN = new RunClassifier();
+            //Default - runs with the Iris data set.
+            //RunClassifier kNN = new RunClassifier();
+            
+            //Runs with the cars data set.            
+            RunClassifier kNN = new RunClassifier("cars.csv");
             kNN.classify();
             kNN.outputResults();
         }

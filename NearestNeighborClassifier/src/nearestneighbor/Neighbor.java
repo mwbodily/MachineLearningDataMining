@@ -35,6 +35,7 @@ public class Neighbor {
         public Neighbor(int pIndex, double pDistance)
         {
             index = pIndex;
-            distance = pDistance;      
+            distance = pDistance;     
+            //System.out.println("setting distance to: " + distance);
         }
 }

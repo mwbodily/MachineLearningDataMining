@@ -109,11 +109,11 @@ public class RunClassifier {
     * Builds the classifier according to the hard coded classifier. 
     * It then evaluates the training.
     ********************************************************************/
-    private void classifyData() throws Exception
+    private void setUpClassifier() throws Exception
     {
         //Run the classifier (a Naive Bayes is included for reference).
         //Classifier classy = (Classifier)new NaiveBayes();
-        KNNClassifier classy = new KNNClassifier(1);
+        KNNClassifier classy = new KNNClassifier(10);
         classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
         trainingEval.evaluateModel(classy, testing);
@@ -130,6 +130,7 @@ public class RunClassifier {
         training = Filter.useFilter(training, filter);
         testing = Filter.useFilter(testing, filter);
     }
+    
     /********************************************************************
      * Calls the classifier functions to get the classifier started. This
      * is the default version of the class that uses the Iris CSV provided 
@@ -142,8 +143,10 @@ public class RunClassifier {
     public void classify() throws Exception
     {        
         //randomize the data
-        data.randomize(new Random(1));    
-        
+        data.randomize(new Random(1));   
+        //System.out.println(data);
+        //System.out.println(data.classAttribute());
+        //System.out.println("HERE::: " + data.instance(2).classValue());
         //divide the data into training and testing groups.
         splitTrainAndTest();
         
@@ -151,7 +154,7 @@ public class RunClassifier {
         standardizeSets();
         
         // Classify the data
-        classifyData();        
+        setUpClassifier();        
     }
     
     /********************************************************************
@@ -176,7 +179,7 @@ public class RunClassifier {
         standardizeSets();
 
         // Classify the data
-        classifyData();
+        setUpClassifier();
     }
     
     /********************************************************************
