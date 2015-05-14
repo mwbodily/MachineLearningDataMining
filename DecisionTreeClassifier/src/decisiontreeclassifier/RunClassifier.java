@@ -4,7 +4,7 @@
  * HardCodedClassifierMain.java. The classifier itself is located in 
  * KNNClassifier.java.
  ********************************************************************/
-package nearestneighbor;
+package decisiontreeclassifier;
 
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
@@ -113,7 +113,7 @@ public class RunClassifier {
     {
         //Run the classifier (a Naive Bayes is included for reference).
         //Classifier classy = (Classifier)new NaiveBayes();
-        KNNClassifier classy = new KNNClassifier(13);
+        ID3Classifier classy = new ID3Classifier();
         classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
         trainingEval.evaluateModel(classy, testing);
