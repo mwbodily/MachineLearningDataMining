@@ -116,7 +116,7 @@ public class RunClassifier {
         ID3Classifier classy = new ID3Classifier();
         classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
-        trainingEval.evaluateModel(classy, testing);
+        //trainingEval.evaluateModel(classy, testing);
     }
     
     /********************************************************************
