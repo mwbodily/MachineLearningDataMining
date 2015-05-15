@@ -26,13 +26,27 @@ public class InstanceTree<T> {
     
     public void printTree()
     {
-        System.out.println("This functionality is not yet complete.");
+        System.out.println("-----------------------------------------------");
         System.out.println("Root: Instances: " + root.dataSet.numInstances());
-        
-        for(int i = 0; i < root.numChildren(); i++)
+        printTreeOutput(root, 1);
+        System.out.println("-----------------------------------------------");
+    }
+    
+    public void printTreeOutput(Node theRoot, int tabs)
+    {   
+        for(int i = 0; i < theRoot.numChildren(); i++)
         {
-            Node temp = root.getChildAt(i);
-            System.out.println("Child " + i + ": Instances: " + temp.dataSet.numInstances());
+            for(int j = 0; j < tabs; j++)
+            {
+                System.out.print("   ");
+            }
+            System.out.println("Child " + (i+1) + ": Instances: " + theRoot.getChildAt(i).dataSet.numInstances());
+            if(theRoot.getChildAt(i) != null)
+            {
+                tabs++;
+                printTreeOutput(theRoot.getChildAt(i), tabs);
+            }
+            tabs --;
         }
     }
     
@@ -73,10 +87,8 @@ public class InstanceTree<T> {
         
         public void addChild(Node<T> child)
         {
-            //System.out.println("I'm here!!!" + child.index);
             child.parent = this;
             children.add(child);
-            //System.out.println(children.get(0).dataSet.numInstances());
         }
         
         public Node<T> getChildAt(int index)
