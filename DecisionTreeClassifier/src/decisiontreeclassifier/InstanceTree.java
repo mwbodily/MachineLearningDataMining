@@ -157,7 +157,6 @@ public class InstanceTree<T> {
             //System.out.println(inst);
             for(int i = 0; i < numChildren; i++)
             {
-                //System.out.println("loop");
                 System.out.println("Instance splitting on: " + splitOn);
                 if(children.get(i).withinRange(inst.value(children.get(i).splitOn), i))
                 {
@@ -174,10 +173,12 @@ public class InstanceTree<T> {
         public Boolean withinRange(double value, int childIndex)
         {
             //System.out.println("This is where the problem is");
-            System.out.println(dataSet.numInstances());
-            System.out.println(lowerRange);
-            System.out.println(upperRange);
-            System.out.println("Value:" + value);
+            System.out.println("            Num Instances: " + dataSet.numInstances());
+            System.out.println("            LR: " + lowerRange);
+            System.out.println("            UR: " + upperRange);
+            System.out.println("            Value: " + value);
+            Boolean truth = value >= lowerRange && value < upperRange;
+            System.out.println("            In Range: " + truth);
             return(value >= lowerRange && value < upperRange);
         }
         

@@ -66,11 +66,15 @@ public class ITree2 extends Classifier{
     //TODO, just implement the kth function for the lowest... increases efficeincy...
     public double findRange(int attIndex, Node theNode)
     {
+        System.out.println("        Find Range Called");
         double range = 0;
         double highest = Double.NEGATIVE_INFINITY;
-        double lowest = theNode.dataSet.kthSmallestValue(attIndex, 1);
-        int numInstances = theNode.dataSet.numInstances();
+        //double lowest = theNode.dataSet.kthSmallestValue(attIndex, 1);
+        double lowest = Double.POSITIVE_INFINITY;
+        System.out.println(theNode.dataSet.instance(0).attribute(attIndex));
         
+        int numInstances = theNode.dataSet.numInstances();
+        System.out.println("        Find Range Setup Finished");
         //Find the highest value in the node parameter...
         for(int i = 0; i < numInstances; i++)
         {
@@ -78,12 +82,33 @@ public class ITree2 extends Classifier{
            {
                highest = theNode.dataSet.instance(i).value(attIndex);
            }
+           if(theNode.dataSet.instance(i).value(attIndex) < lowest)
+           {
+               lowest = theNode.dataSet.instance(i).value(attIndex);
+           }
         }
         range = highest - lowest;
+        System.out.println("Range found: " + range);
+        System.out.println("Increment will be: " + range/binNum);
        // System.out.println("            Higest: " + highest);
         //System.out.println("            Lowest: " + lowest);
         //System.out.println("            Range: " + range);
         return range;
+    }
+    
+    public double findLowest(int attIndex, Node theNode)
+    {
+        double lowest = Double.POSITIVE_INFINITY;
+        int numInstances = theNode.dataSet.numInstances();
+        
+        for(int i = 0; i < numInstances; i++)
+        {
+           if(theNode.dataSet.instance(i).value(attIndex) < lowest)
+           {
+               lowest = theNode.dataSet.instance(i).value(attIndex);
+           }
+        }  
+        return lowest;
     }
     
     public double findNodeScore(double range, int attIndex, double totalEntropy, Node theNode)
@@ -91,7 +116,7 @@ public class ITree2 extends Classifier{
         //System.out.println("            In Find Node Score");
         double score = 0;
         double increment = range / binNum;
-        double lowest = theNode.dataSet.kthSmallestValue(attIndex, 1);
+        double lowest = findLowest(attIndex, theNode);
         double grandTotal = 0.00;
         int numClasses = theNode.dataSet.numClasses();
         double numInstances = theNode.dataSet.numInstances();  
@@ -159,14 +184,14 @@ public class ITree2 extends Classifier{
     
     public int scoreForNode(Node theNode)
     {
-        //System.out.println("Score For Node Called");
-        //System.out.println("    Debugging info----");
+        System.out.println("Score For Node Called");
+        System.out.println("    Debugging info----");
         
         //Find the Entropy for the whole thing...
         double score = 0;
         double entropy = findEntropy(theNode);
         
-        //System.out.println("        Entropy: " + entropy);
+        System.out.println("        Entropy: " + entropy);
         
         int numAttributes = theNode.dataSet.numAttributes() - 1;
         
@@ -177,8 +202,9 @@ public class ITree2 extends Classifier{
         {
             if(!theNode.usedFeatures.contains(i))
             {           
-                //System.out.println("        Finding range for attribute " + i);
+                System.out.println("        Finding range for attribute " + i);
                 double range = findRange(i, theNode);
+                System.out.println("        Range: " + range);
                 score = findNodeScore(range, i, entropy, theNode);
             
                 if(score > bestAttributeScore)
@@ -191,7 +217,7 @@ public class ITree2 extends Classifier{
         }
        // System.out.println("        Score: " + bestAttribute);
         //System.out.println("    End Debugging----");
-        //System.out.println("Score For Node Completed");
+        System.out.println("Score For Node Completed");
         
         return bestAttribute;
     }
@@ -222,7 +248,9 @@ public class ITree2 extends Classifier{
         }
         double range = findRange(attIndex, theNode);
         double increment = range / binNum;
-        double lowest = theNode.dataSet.kthSmallestValue(attIndex, 1);
+        double lowest = findLowest(attIndex, theNode);
+        int numInstances = theNode.dataSet.numInstances();
+        
         //System.out.println("    check 1");
         for(int i = 0; i < binNum; i++)
         {
@@ -248,11 +276,8 @@ public class ITree2 extends Classifier{
             theNode.addChild(child);
         }
         
-        //System.out.println("    check 2");
-        
-       
-        int numInstances = theNode.dataSet.numInstances();
-        
+        System.out.println("    check 2");
+
         List offsets = new ArrayList<Integer>();
 
         for(int i = 0; i < binNum; i++)
@@ -260,35 +285,40 @@ public class ITree2 extends Classifier{
             offsets.add(0);
         }
         
-        //System.out.println("    check 3");
-        //System.out.println("    children: " + theNode.numChildren);
-        for(int j = 0; j < binNum; j++)
+        System.out.println("    check 3");
+        filterInstances(theNode, attIndex);
+        System.out.println("Add Tree Node Completed");
+    }
+    
+    
+    public void filterInstances(Node theNode, int attIndex)
+    {
+        int numInstances;
+        for(int i = 0; i < theNode.numChildren; i++)
         {
-           // System.out.println("    loop check " + j);
-            for(int i = 0; i < numInstances; i++)
+            System.out.println("Check 1");
+            numInstances = theNode.getChildAt(i).dataSet.numInstances();
+            for(int j = 0; j < numInstances; j++)
             {
-                //System.out.println("        inner loop check " + i);
-                if(!(theNode.dataSet.instance(i).value(attIndex) >= theNode.getChildAt(j).lowerRange && 
-                        theNode.dataSet.instance(i).value(attIndex) < theNode.getChildAt(j).upperRange))
+                System.out.println("Check 2");
+                System.out.println("    numInst: " + numInstances + " j: " + j);
+                if(!(theNode.getChildAt(i).withinRange(theNode.getChildAt(i).dataSet.instance(j).value(attIndex), attIndex)))
                 {
-                   // System.out.println("            If check 1 " + offsets.get(j));
-                    //System.out.println("            If check 1.25 " + theNode.getChildAt(j).dataSet.numInstances());
-                    theNode.getChildAt(j).dataSet.delete(i - (int) offsets.get(j));
-                    //System.out.println("            If check 1.5");
-                    int temp = ((int) offsets.get(j)) + 1;
-                    //System.out.println("            If check 1.75");
-                    offsets.set(j, temp);
-                    //System.out.println("            If check 2");
+                    theNode.getChildAt(i).dataSet.delete(j);
+                    j -= 1;
+                    numInstances -= 1;
+                    
+                }
+                else
+                {
+                    System.out.println("Keeping it.");
                 }
             }
         }
-
-        //System.out.println("Add Tree Node Completed");
     }
-    
     public void buildTree(Node root)
     {
-        //System.out.println("Build Tree Called");
+        System.out.println("Build Tree Called");
         //create the root, this should contain all the instances.
         int attribute2Split;
         Node nodeOfInterest = iTree.root;
@@ -297,7 +327,7 @@ public class ITree2 extends Classifier{
         //System.out.println("About to start the while loop"); -- Removed, it output this statement.
         while(!done)
         {
-            //System.out.println(nodeOfInterest.dataSet.numInstances());
+            System.out.println(nodeOfInterest.dataSet.numInstances());
             if(nodeOfInterest.allFeaturesUsed() || nodeOfInterest.dataSet.numInstances() == 1)
             {
                // System.out.println("here1 index: " + nodeOfInterest.index + " inst: " + nodeOfInterest.dataSet.numInstances() + 
@@ -352,10 +382,13 @@ public class ITree2 extends Classifier{
             }
             else
             {       
+                System.out.println("in the else");
                 if(nodeOfInterest.dataSet.numInstances() > 0)
                 {
+                    System.out.println("in the first if");
                     //works fine up to here
                     attribute2Split = scoreForNode(nodeOfInterest);
+                    System.out.println("here1");
                     if(nodeOfInterest == iTree.root)
                     {
                         nodeOfInterest.splitOn = attribute2Split;
@@ -364,6 +397,7 @@ public class ITree2 extends Classifier{
                     nodeOfInterest.usedFeatures.add(attribute2Split);
                     addTreeNode(attribute2Split, nodeOfInterest);
                     nodeOfInterest = nodeOfInterest.getChildAt(0);
+                    System.out.println("ending the first if.");
                 }
                 else
                 {
@@ -403,11 +437,11 @@ public class ITree2 extends Classifier{
     
     public void runTreeStuff()
     {
-        //System.out.println("Run Tree Stuff Called");
+        System.out.println("Run Tree Stuff Called");
         iTree = new InstanceTree(dataSet);
         //System.out.println("Instance Tree Successfully Created");
         buildTree(iTree.root);
-        //System.out.println("Run Tree Stuff Completed");
+        System.out.println("Run Tree Stuff Completed");
     }
     
     /********************************************************************
@@ -421,7 +455,6 @@ public class ITree2 extends Classifier{
         runTreeStuff();
         System.out.println("Build Classifier Completed");
         iTree.printTree();
-        
     }
    
     /********************************************************************

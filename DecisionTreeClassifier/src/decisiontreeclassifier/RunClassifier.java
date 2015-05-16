@@ -149,8 +149,8 @@ public class RunClassifier {
         splitTrainAndTest();
         
         //standardize the data
-        //standardizeSets();
-        
+        standardizeSets();
+
         // Classify the data
         setUpClassifier();        
     }
