@@ -18,6 +18,7 @@ public class DecisionTreeClassifierMain {
         try{
             RunClassifier basic = new RunClassifier();
             basic.classify();
+            basic.outputResults();
         }
         catch (Exception er)
         {

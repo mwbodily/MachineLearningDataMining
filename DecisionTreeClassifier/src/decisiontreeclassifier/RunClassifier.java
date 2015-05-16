@@ -116,7 +116,7 @@ public class RunClassifier {
         ID3Classifier classy = new ID3Classifier();
         classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
-        //trainingEval.evaluateModel(classy, testing);
+        trainingEval.evaluateModel(classy, testing);
     }
     
     /********************************************************************
@@ -144,8 +144,6 @@ public class RunClassifier {
     {        
         //randomize the data
         data.randomize(new Random(1));   
-
-        
         
         //divide the data into training and testing groups.
         splitTrainAndTest();

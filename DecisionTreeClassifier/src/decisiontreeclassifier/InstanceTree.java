@@ -8,6 +8,7 @@ package decisiontreeclassifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import weka.core.Instance;
 import weka.core.Instances;
 
 /**
@@ -56,21 +57,33 @@ public class InstanceTree<T> {
         public Instances dataSet;
         public ArrayList usedFeatures;
         int index;
-        
+        double lowerRange;
+        double upperRange;
+        public int splitOn;
+        public int numChildren;
         
         public Node(Instances inst)
         {
+            numChildren = 0;
             dataSet = inst;
             usedFeatures = new ArrayList<Integer>();
             children = new ArrayList<Node<T>>();
         }
         
-        public Node(Instances inst, ArrayList uF, int ind)
+        public Node(Instances inst, ArrayList uF, int ind, double lR, double uR, int splitOn)
         {
+            numChildren = 0;
             dataSet = inst;
             usedFeatures = uF;
             index = ind;
             children = new ArrayList<Node<T>>();
+            lowerRange = lR;
+            upperRange = uR;
+        }
+        
+        public Boolean isInNode(double item)
+        {
+            return (item >= lowerRange && item < upperRange);
         }
         
         public int numChildren()
@@ -80,15 +93,41 @@ public class InstanceTree<T> {
         
         public Boolean allFeaturesUsed()
         {
-            System.out.println(dataSet.numAttributes());
-            return((dataSet.numAttributes() - 1) == usedFeatures.size());
-                
+            return((dataSet.numAttributes() - 1) == usedFeatures.size());               
         }
         
         public void addChild(Node<T> child)
         {
             child.parent = this;
             children.add(child);
+            numChildren += 1;
+        }
+        
+        public Boolean hasChildren()
+        {
+            if(numChildren == 0)
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public Node<T> findChild(Instance inst)
+        {
+            for(int i = 0; i < 3; i++)
+            {
+                if(children.get(i).withinRange(inst.value(splitOn), i))
+                {
+                    return children.get(i);
+                    
+                }
+            }
+            return null;
+        }
+        
+        public Boolean withinRange(double value, int childIndex)
+        {
+            return(value >= lowerRange && value < upperRange);
         }
         
         public Node<T> getChildAt(int index)
