@@ -59,7 +59,6 @@ public class ID3Classifier extends Classifier{
         double highest = Double.NEGATIVE_INFINITY;
         double lowest = Double.POSITIVE_INFINITY;
         
-        
         for(int i = 0; i < dataSet.numInstances(); i++)
         {
            if(dataSet.instance(i).value(attIndex) < lowest)

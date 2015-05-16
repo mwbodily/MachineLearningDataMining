@@ -130,7 +130,7 @@ public class InstanceTree<T> {
                 numOfEach.add(0);
             }
             
-            System.out.println("Guessing 1");
+            //System.out.println("Guessing 1");
             for(int i = 0; i < dataSet.numInstances(); i++)
             {
                 int temp = numOfEach.get((int) dataSet.instance(i).classValue());
@@ -145,27 +145,27 @@ public class InstanceTree<T> {
                     guess = (double) i;
                 }
             }
-            System.out.println("Guessing actually finished, guessed a " + guess);
-            System.out.println("-----------");
+            //System.out.println("Guessing actually finished, guessed a " + guess);
+            //System.out.println("-----------");
             return guess;
         }
         
         public Node<T> findChild(Instance inst)
         {
-            System.out.println("I am child: " + dataSet.numInstances());
-            System.out.println("I am split on: " + splitOn);
+            //System.out.println("I am child: " + dataSet.numInstances());
+            //System.out.println("I am split on: " + splitOn);
             //System.out.println(inst);
             for(int i = 0; i < numChildren; i++)
             {
-                System.out.println("Instance splitting on: " + splitOn);
+//                System.out.println("Instance splitting on: " + splitOn);
                 if(children.get(i).withinRange(inst.value(children.get(i).splitOn), i))
                 {
-                    System.out.println("I'm sending us down child " + children.get(i).dataSet.numInstances());
+  //                  System.out.println("I'm sending us down child " + children.get(i).dataSet.numInstances());
                     
                     return children.get(i);
                     
                 }
-                System.out.println("Switching sibling...");
+    //            System.out.println("Switching sibling...");
             }
             return null;
         }
@@ -173,12 +173,12 @@ public class InstanceTree<T> {
         public Boolean withinRange(double value, int childIndex)
         {
             //System.out.println("This is where the problem is");
-            System.out.println("            Num Instances: " + dataSet.numInstances());
-            System.out.println("            LR: " + lowerRange);
-            System.out.println("            UR: " + upperRange);
-            System.out.println("            Value: " + value);
+      //      System.out.println("            Num Instances: " + dataSet.numInstances());
+        //    System.out.println("            LR: " + lowerRange);
+          //  System.out.println("            UR: " + upperRange);
+            //System.out.println("            Value: " + value);
             Boolean truth = value >= lowerRange && value < upperRange;
-            System.out.println("            In Range: " + truth);
+            //System.out.println("            In Range: " + truth);
             return(value >= lowerRange && value < upperRange);
         }
         
