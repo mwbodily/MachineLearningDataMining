@@ -16,7 +16,7 @@ public class DecisionTreeClassifierMain {
      */
     public static void main(String[] args) {
         try{
-            RunClassifier basic = new RunClassifier();
+            RunClassifier basic = new RunClassifier("IrisCSV.csv");
             basic.classify();
             basic.outputResults();
         }

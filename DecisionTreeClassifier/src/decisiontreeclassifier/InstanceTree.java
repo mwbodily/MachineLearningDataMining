@@ -41,7 +41,8 @@ public class InstanceTree<T> {
             {
                 System.out.print("   ");
             }
-            System.out.println("Child " + (i+1) + ": Instances: " + theRoot.getChildAt(i).dataSet.numInstances());
+            System.out.print("Child " + (i+1) + ": Instances: " + theRoot.getChildAt(i).dataSet.numInstances());
+            System.out.println(" Split on: " + theRoot.getChildAt(i).splitOn);
             if(theRoot.getChildAt(i) != null)
             {
                 tabs++;
@@ -61,6 +62,8 @@ public class InstanceTree<T> {
         double upperRange;
         public int splitOn;
         public int numChildren;
+        public Boolean done;
+        Node<T> iRoot;
         
         public Node(Instances inst)
         {
@@ -68,9 +71,10 @@ public class InstanceTree<T> {
             dataSet = inst;
             usedFeatures = new ArrayList<Integer>();
             children = new ArrayList<Node<T>>();
+            done = false;
         }
         
-        public Node(Instances inst, ArrayList uF, int ind, double lR, double uR, int splitOn)
+        public Node(Instances inst, ArrayList uF, int ind, double lR, double uR, int pSplitOn, Node pIRoot)
         {
             numChildren = 0;
             dataSet = inst;
@@ -79,6 +83,9 @@ public class InstanceTree<T> {
             children = new ArrayList<Node<T>>();
             lowerRange = lR;
             upperRange = uR;
+            done = false;
+            iRoot = pIRoot;
+            splitOn = pSplitOn;
         }
         
         public Boolean isInNode(double item)
@@ -98,6 +105,7 @@ public class InstanceTree<T> {
         
         public void addChild(Node<T> child)
         {
+            //System.out.println("addChild::: " + child.dataSet.numInstances() + " to " + dataSet.numInstances());
             child.parent = this;
             children.add(child);
             numChildren += 1;
@@ -112,21 +120,64 @@ public class InstanceTree<T> {
             return true;
         }
         
+        public double makeGuess()
+        {
+            double guess = 0.00;
+            ArrayList<Integer> numOfEach = new ArrayList<>();
+            
+            for(int i = 0; i < iRoot.dataSet.numClasses(); i++)
+            {
+                numOfEach.add(0);
+            }
+            
+            System.out.println("Guessing 1");
+            for(int i = 0; i < dataSet.numInstances(); i++)
+            {
+                int temp = numOfEach.get((int) dataSet.instance(i).classValue());
+                temp += 1;
+                numOfEach.set((int) dataSet.instance(i).classValue(), temp);
+            }
+            
+            for(int i = 0; i < iRoot.dataSet.numClasses(); i++)
+            {
+                if((double) numOfEach.get(i) > guess)
+                {
+                    guess = (double) i;
+                }
+            }
+            System.out.println("Guessing actually finished, guessed a " + guess);
+            System.out.println("-----------");
+            return guess;
+        }
+        
         public Node<T> findChild(Instance inst)
         {
-            for(int i = 0; i < 3; i++)
+            System.out.println("I am child: " + dataSet.numInstances());
+            System.out.println("I am split on: " + splitOn);
+            //System.out.println(inst);
+            for(int i = 0; i < numChildren; i++)
             {
-                if(children.get(i).withinRange(inst.value(splitOn), i))
+                //System.out.println("loop");
+                System.out.println("Instance splitting on: " + splitOn);
+                if(children.get(i).withinRange(inst.value(children.get(i).splitOn), i))
                 {
+                    System.out.println("I'm sending us down child " + children.get(i).dataSet.numInstances());
+                    
                     return children.get(i);
                     
                 }
+                System.out.println("Switching sibling...");
             }
             return null;
         }
         
         public Boolean withinRange(double value, int childIndex)
         {
+            //System.out.println("This is where the problem is");
+            System.out.println(dataSet.numInstances());
+            System.out.println(lowerRange);
+            System.out.println(upperRange);
+            System.out.println("Value:" + value);
             return(value >= lowerRange && value < upperRange);
         }
         

@@ -134,11 +134,9 @@ public class ID3Classifier extends Classifier{
             }
         }
         
-        //System.out.println("Range 3");
         for(int i = 0; i < numClasses; i++)
         {
             total3 += range3[i];
-          //  System.out.println(range3[i]);
             
             if(range3[i] != 0)
             {
@@ -146,18 +144,12 @@ public class ID3Classifier extends Classifier{
             }
         }
         
-        //System.out.println("TOTALS: " + total1 + " " + total2 + " " + total3);
-        
         //Find the average of the results
         double grandTotal = total1 + total2 + total3;
         
         entropy1 *= -1;
         entropy2 *= -1;
         entropy3 *= -1;
-        
-        //System.out.println("ent1:  " + entropy1);
-        //System.out.println("ent2:  " + entropy2);
-        //System.out.println("ent3:  " + entropy3);
         
         score = ((total1 / grandTotal) * entropy1) + ((total2 / grandTotal) * entropy2) + ((total3 / grandTotal) * entropy3);
         
@@ -184,7 +176,6 @@ public class ID3Classifier extends Classifier{
         {
             if(!theNode.usedFeatures.contains(i))
             {           
-                //System.out.println("Attribute " + i + "----------");
                 double range = findRange(i);
                 score = findNodeScore(range, i, entropy);
             
@@ -195,11 +186,8 @@ public class ID3Classifier extends Classifier{
                     bestAttribute = i;
                 }
             
-               //System.out.println("");
             }
         }
-        
-        //System.out.println("Splitting on " + bestAttribute + " with a score of " + bestAttributeScore);
         
         return bestAttribute;
     }
@@ -212,10 +200,6 @@ public class ID3Classifier extends Classifier{
         ArrayList temp = new ArrayList<Integer>();
         temp = root.usedFeatures;
         
-        //for(int i : temp)
-       // {
-            
-       // }
         while(listIterator.hasNext())
         {
             int i = listIterator.next();
@@ -240,9 +224,9 @@ public class ID3Classifier extends Classifier{
         ArrayList lCopy2 = (ArrayList<Integer>) root.usedFeatures.clone();//copyArrayList(root);//new ArrayList(root.usedFeatures);
         ArrayList lCopy3 = (ArrayList<Integer>) root.usedFeatures.clone();//copyArrayList(root);//new ArrayList(root.usedFeatures);
         
-        Node child1 = new Node(copy1, lCopy1, 0, Double.NEGATIVE_INFINITY, (lowest+increment), attIndex);
-        Node child2 = new Node(copy2, lCopy2, 1, (lowest+increment), (lowest + (2*increment)), attIndex);
-        Node child3 = new Node(copy3, lCopy3, 2, (lowest + (3*increment)), Double.POSITIVE_INFINITY, attIndex);
+        Node child1 = new Node(copy1, lCopy1, 0, Double.NEGATIVE_INFINITY, (lowest+increment), attIndex, iTree.root);
+        Node child2 = new Node(copy2, lCopy2, 1, (lowest+increment), (lowest + (2*increment)), attIndex, iTree.root);
+        Node child3 = new Node(copy3, lCopy3, 2, (lowest + (3*increment)), Double.POSITIVE_INFINITY, attIndex, iTree.root);
        
         int numInstances = root.dataSet.numInstances();
         
@@ -250,7 +234,6 @@ public class ID3Classifier extends Classifier{
         int offset2 = 0;
         int offset3 = 0;
         
-        //System.out.println("here "  + root.dataSet.numInstances());
         
         for(int i = 0; i < numInstances; i++)
         {
@@ -283,11 +266,6 @@ public class ID3Classifier extends Classifier{
         root.addChild(child2);
         root.addChild(child3);
         
-        //System.out.println("root "  + root.dataSet.numInstances());
-        //System.out.println("c1 "  + child1.dataSet.numInstances());
-        //System.out.println("c2 "  + child2.dataSet.numInstances());
-        //System.out.println("c3 "  + child3.dataSet.numInstances());
-        //System.out.println("c4 "  + child4.dataSet.numInstances());
     }
     
     public void buildTree(Node root)
@@ -299,27 +277,16 @@ public class ID3Classifier extends Classifier{
         
         while(!done)
         {
-            //System.out.println("In the main while loop");
             if(nodeOfInterest.allFeaturesUsed())
             {
-                //System.out.println("All features used...");
-                //nodeOfInterest.outputUsedFeatures();
-                //System.out.println("I'm in the if statement lv.1");
                 if(nodeOfInterest.index != 2)
                 {
-                    //System.out.println("I'm in the if statement lv.2");
-                    //System.out.println("1 Switching Sibling... Ind: " + nodeOfInterest.index + " " + nodeOfInterest.dataSet.numInstances());
                     nodeOfInterest = nodeOfInterest.getSibling();
-                    //System.out.println("1 We're now on sibling: " + nodeOfInterest.index + " " + nodeOfInterest.dataSet.numInstances());
                 }
                 else
                 {   
-                    //System.out.println("I'm in the 2nd level else statement");
-                    //while(nodeOfInterest.index == 2 && nodeOfInterest.allFeaturesUsed())
                     while(nodeOfInterest.allFeaturesUsed())
-                    {
-                        //System.out.println("1 Going up a level " + + nodeOfInterest.index + " " + nodeOfInterest.dataSet.numInstances());
-                        
+                    {                        
                         if(nodeOfInterest != iTree.root)
                         {
                             nodeOfInterest = nodeOfInterest.getParent();
@@ -327,9 +294,7 @@ public class ID3Classifier extends Classifier{
                         
                         if(nodeOfInterest.index != 2 && nodeOfInterest != iTree.root)
                         {
-                            //System.out.println("2 Switching Sibling... Ind: " + nodeOfInterest.index + " " + nodeOfInterest.dataSet.numInstances());
                             nodeOfInterest = nodeOfInterest.getSibling();
-                            //System.out.println("2 We're now on sibling: " + nodeOfInterest.index + " " + nodeOfInterest.dataSet.numInstances());
                         
                         }
                         if(nodeOfInterest.getParent() == iTree.root && nodeOfInterest.index == 3)

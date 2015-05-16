@@ -113,7 +113,7 @@ public class RunClassifier {
     {
         //Run the classifier (a Naive Bayes is included for reference).
         //Classifier classy = (Classifier)new NaiveBayes();
-        ID3Classifier classy = new ID3Classifier();
+        ITree2 classy = new ITree2(3);
         classy.buildClassifier(training);
         trainingEval = new Evaluation(training);
         trainingEval.evaluateModel(classy, testing);
@@ -149,7 +149,7 @@ public class RunClassifier {
         splitTrainAndTest();
         
         //standardize the data
-        standardizeSets();
+        //standardizeSets();
         
         // Classify the data
         setUpClassifier();        
