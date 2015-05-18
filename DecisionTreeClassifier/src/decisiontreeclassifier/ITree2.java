@@ -20,7 +20,6 @@ import weka.core.Instances;
 public class ITree2 extends Classifier{
     private Instances dataSet;
     InstanceTree iTree;
-    //List attributeSelection;
     int binNum;
 
     /********************************************************************
@@ -28,10 +27,12 @@ public class ITree2 extends Classifier{
      ********************************************************************/
     public ITree2(int bn)
     {
-        //attributeSelection = new ArrayList();
         binNum = bn;
     }
     
+   /********************************************************************
+    * Finds the entropy for the node. 
+    ********************************************************************/
     public double findEntropy(Node theNode)
     {
         double numClasses;
@@ -75,6 +76,10 @@ public class ITree2 extends Classifier{
         return entropy;
     }
     
+   /********************************************************************
+    * Finds the range of the values, it's more efficient to do it this
+    * way than to look for the highest then call findLowest.
+    ********************************************************************/
     public double findRange(int attIndex, Node theNode)
     {
         double range = 0;
@@ -100,6 +105,10 @@ public class ITree2 extends Classifier{
         return range;
     }
     
+   /********************************************************************
+    * Finds the lowest value in the dataSet. Couldn't use kthlowest since
+    * sometimes the item is nominial, not numeric.
+    ********************************************************************/
     public double findLowest(int attIndex, Node theNode)
     {
         double lowest = Double.POSITIVE_INFINITY;
@@ -115,6 +124,9 @@ public class ITree2 extends Classifier{
         return lowest;
     }
     
+   /********************************************************************
+    * Initializes a list - nothing fancy.
+    ********************************************************************/
     public void initializeList(List<Double> theList, int numItems)
     {
         for(int i = 0; i < numItems; i++)
@@ -123,6 +135,10 @@ public class ITree2 extends Classifier{
         }
     }
     
+   /********************************************************************
+    * Finds the entropies for each of the splits (the number of children
+    * is indicated by binNum.
+    ********************************************************************/
     public double findNodeScore(double range, int attIndex, double totalEntropy, Node theNode)
     {
         double score = 0;
@@ -190,6 +206,10 @@ public class ITree2 extends Classifier{
         return score;
     }
     
+   /********************************************************************
+    * Finds the score for the node so that it can be determined which
+    * one is best to split on.
+    ********************************************************************/
     public int scoreForNode(Node theNode)
     {      
         //Find the Entropy for the whole thing...
@@ -222,6 +242,9 @@ public class ITree2 extends Classifier{
         return bestAttribute;
     }
     
+   /********************************************************************
+    * Makes a deep copy of the usedFeatures list. 
+    ********************************************************************/
     public ArrayList copyArrayList(Node root)
     {
         ArrayList copiedList = new ArrayList<Integer>();
@@ -240,6 +263,10 @@ public class ITree2 extends Classifier{
     
     }
     
+   /********************************************************************
+    * Adds children nodes with all the necessary data to the Node 
+    * parameter
+    ********************************************************************/
     public void addTreeNode(int attIndex, Node theNode)
     {
         double range = findRange(attIndex, theNode);
@@ -270,7 +297,11 @@ public class ITree2 extends Classifier{
         filterInstances(theNode, attIndex);
     }
     
-    
+    /********************************************************************
+     * Goes through for each child of a node and if the value does 
+     * not fall in the range associated with that value, it removes
+     * it from the child node's dataSet.
+     ********************************************************************/
     public void filterInstances(Node theNode, int attIndex)
     {
         int numInstances;
@@ -288,6 +319,10 @@ public class ITree2 extends Classifier{
             }
         }
     }
+    
+   /********************************************************************
+    * Builds the tree used by the algorithm. 
+    ********************************************************************/
     public void buildTree(Node root)
     {
         //create the root, this should contain all the instances.
@@ -331,12 +366,11 @@ public class ITree2 extends Classifier{
         }       
     }
     
-    public void runTreeStuff()
-    {
-        iTree = new InstanceTree(dataSet);
-        buildTree(iTree.root);
-    }
     
+   /********************************************************************
+    * Changes the missing data to 0.0. For the voting data set, this 
+    * should be sufficient seeing as 0.00 is more or less random.
+    ********************************************************************/
     public Instances fixMissingData(Instances iToFix)
     {
         for(int i = 0; i < iToFix.numInstances(); i++)
@@ -360,8 +394,6 @@ public class ITree2 extends Classifier{
         dataSet = fixMissingData(i);
         iTree = new InstanceTree(dataSet);
         buildTree(iTree.root);
-        //runTreeStuff();
-
         
         iTree.printTree();
     }
