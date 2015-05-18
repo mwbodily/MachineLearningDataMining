@@ -18,7 +18,8 @@ public class DecisionTreeClassifierMain {
         try{
             //RunClassifier basic = new RunClassifier("IrisCSV.csv");
             //RunClassifier basic = new RunClassifier("cars.csv");
-            RunClassifier basic = new RunClassifier("voting.csv");
+            //RunClassifier basic = new RunClassifier("voting.csv");
+            RunClassifier basic = new RunClassifier("lenses.csv");
             basic.classify();
             basic.outputResults();
         }

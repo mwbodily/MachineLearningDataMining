@@ -18,13 +18,19 @@ import weka.core.Instances;
 public class InstanceTree<T> {
     public Node<T> root;
 
+    /********************************************************************
+     * Constructs a tree with a root node containing the data set passed
+     * in.
+     ********************************************************************/
     public InstanceTree(Instances rootData) {
         root = new Node<T>(rootData);
-        //root.dataSet = rootData;
         root.children = new ArrayList<Node<T>>();
-        
     }
     
+    /********************************************************************
+    * Calls the recursive function and does necessary setup to print the
+    * tree.
+    ********************************************************************/
     public void printTree()
     {
         System.out.println("-----------------------------------------------");
@@ -33,7 +39,10 @@ public class InstanceTree<T> {
         System.out.println("-----------------------------------------------");
     }
     
-    public void printTreeOutput(Node theRoot, int tabs)
+    /********************************************************************
+     * Recursively output the tree.
+     ********************************************************************/
+    private void printTreeOutput(Node theRoot, int tabs)
     {   
         for(int i = 0; i < theRoot.numChildren(); i++)
         {
@@ -65,6 +74,9 @@ public class InstanceTree<T> {
         public Boolean done;
         Node<T> iRoot;
         
+        /********************************************************************
+        * Constructor for a node, only needs the instances.
+        ********************************************************************/
         public Node(Instances inst)
         {
             numChildren = 0;
@@ -74,6 +86,11 @@ public class InstanceTree<T> {
             done = false;
         }
         
+        /********************************************************************
+        * Constructor for a node.
+        * 
+        * TODO: cut down on the data needed!
+        ********************************************************************/
         public Node(Instances inst, ArrayList uF, int ind, double lR, double uR, int pSplitOn, Node pIRoot)
         {
             numChildren = 0;
@@ -88,29 +105,35 @@ public class InstanceTree<T> {
             splitOn = pSplitOn;
         }
         
-        public Boolean isInNode(double item)
-        {
-            return (item >= lowerRange && item < upperRange);
-        }
-        
+        /********************************************************************
+        * Returns the number of children that the node has. 
+        ********************************************************************/
         public int numChildren()
         {
             return children.size();
         }
         
+        /********************************************************************
+        * Sees if the node has used all possible features to split on.
+        ********************************************************************/
         public Boolean allFeaturesUsed()
         {
             return((dataSet.numAttributes() - 1) == usedFeatures.size());               
         }
         
+        /********************************************************************
+        * Adds a child to the node.
+        ********************************************************************/
         public void addChild(Node<T> child)
         {
-            //System.out.println("addChild::: " + child.dataSet.numInstances() + " to " + dataSet.numInstances());
             child.parent = this;
             children.add(child);
             numChildren += 1;
         }
         
+        /********************************************************************
+        * Checks if the node has children. 
+        ********************************************************************/
         public Boolean hasChildren()
         {
             if(numChildren == 0)
@@ -120,17 +143,20 @@ public class InstanceTree<T> {
             return true;
         }
         
+        /********************************************************************
+        * Makes a guess based on how many instances of each type are in the
+        * data set for the leaf node.
+        ********************************************************************/
         public double makeGuess()
         {
             double guess = 0.00;
             ArrayList<Integer> numOfEach = new ArrayList<>();
-            
+
             for(int i = 0; i < iRoot.dataSet.numClasses(); i++)
             {
                 numOfEach.add(0);
             }
-            
-            //System.out.println("Guessing 1");
+
             for(int i = 0; i < dataSet.numInstances(); i++)
             {
                 int temp = numOfEach.get((int) dataSet.instance(i).classValue());
@@ -145,65 +171,69 @@ public class InstanceTree<T> {
                     guess = (double) i;
                 }
             }
-            //System.out.println("Guessing actually finished, guessed a " + guess);
-            //System.out.println("-----------");
             return guess;
         }
         
+        /********************************************************************
+        * Finds the proper child for the instance based on what attribute is
+        * being tested.
+        * 
+        * TODO: I don't think this is working correctly. Check on it more.
+        ********************************************************************/
         public Node<T> findChild(Instance inst)
         {
-            //System.out.println("I am child: " + dataSet.numInstances());
-            //System.out.println("I am split on: " + splitOn);
-            //System.out.println(inst);
             for(int i = 0; i < numChildren; i++)
             {
-//                System.out.println("Instance splitting on: " + splitOn);
                 if(children.get(i).withinRange(inst.value(children.get(i).splitOn), i))
                 {
-  //                  System.out.println("I'm sending us down child " + children.get(i).dataSet.numInstances());
-                    
                     return children.get(i);
-                    
                 }
-    //            System.out.println("Switching sibling...");
             }
             return null;
         }
         
+        /********************************************************************
+        * Tests to see if every item in the dataSet is the same.
+        ********************************************************************/
+        public Boolean allTheSame()
+        {
+            for(int i = 0; i < dataSet.numInstances(); i++)
+            {
+                if(dataSet.instance(0).classValue() != dataSet.instance(i).classValue())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        /********************************************************************
+        * Tests to see if a value is within the node's range.
+        ********************************************************************/
         public Boolean withinRange(double value, int childIndex)
         {
-            //System.out.println("This is where the problem is");
-      //      System.out.println("            Num Instances: " + dataSet.numInstances());
-        //    System.out.println("            LR: " + lowerRange);
-          //  System.out.println("            UR: " + upperRange);
-            //System.out.println("            Value: " + value);
-            Boolean truth = value >= lowerRange && value < upperRange;
-            //System.out.println("            In Range: " + truth);
             return(value >= lowerRange && value < upperRange);
         }
         
+        /********************************************************************
+        * Gets the node's child at index. (The first child is 0.)
+        ********************************************************************/
         public Node<T> getChildAt(int index)
         {
             return children.get(index);
         }
-        
+
+       /********************************************************************
+        * Gets the node's parent 
+        ********************************************************************/
         public Node getParent()
         {
             return parent;
         }
         
-        public void outputUsedFeatures()
-        {
-            System.out.println("------UF-------");
-            ListIterator<Integer> listIterator = usedFeatures.listIterator();
-            while(listIterator.hasNext())
-            {
-                System.out.println(listIterator.next());
-            }
-            System.out.println("------UF-------");
-        
-        }
-        
+       /********************************************************************
+        * Gets the node's sibling. 
+        ********************************************************************/
         public Node getSibling()
         {
             return parent.getChildAt((index + 1));

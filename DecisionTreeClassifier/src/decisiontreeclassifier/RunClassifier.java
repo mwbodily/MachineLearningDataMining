@@ -151,6 +151,18 @@ public class RunClassifier {
         //standardize the data
         standardizeSets();
 
+        //nominalize class data
+        NumericToNominal convert= new NumericToNominal();
+        String[] options = new String[2];
+        options[0] = "-R";
+        options[1] = "last";
+        
+        convert.setOptions(options);
+        convert.setInputFormat(training);
+        training = Filter.useFilter(training, convert);
+        
+        testing = Filter.useFilter(testing, convert);
+                
         // Classify the data
         setUpClassifier();        
     }
