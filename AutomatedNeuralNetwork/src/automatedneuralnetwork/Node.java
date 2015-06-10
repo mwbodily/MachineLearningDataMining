@@ -61,30 +61,36 @@ public class Node {
     
     public void calculateOLError()
     {
-        System.out.println("\t(OL) The output for this node is: " + output);
-        System.out.println("\t(OL) The target for this node is: " + target);
+   //     System.out.println("\t(OL) The output for this node is: " + output);
+   //     System.out.println("\t(OL) The target for this node is: " + target);
         error = (output - target) * output * (1 - output);
-        System.out.println("\t(OL) The resulting error for this target is: " + error);
-        System.out.println();
+   //     System.out.println("\t(OL) The resulting error for this target is: " + error);
+   //     System.out.println();
     }
     
     public void calculateHLError(Layer nextLayer)
     {
-        error = output*( 1 -output);
+        error = output*(1 - output);
+    //    System.out.println("The current error is: " + error);
+   //     System.out.println("The output for this node is: " + output);
+        double sum = 0.0;
         
         for(int i = 0; i < nextLayer.numberOfNodes; i++)
         {
             double tempError = nextLayer.Nodes.get(i).error;
             double tempWeight = nextLayer.Nodes.get(i).weightList.get(nodeIndex);
-            System.out.println("\tError of next layer: " + tempError);
-            System.out.println("\tWeight of node to that layer: " + tempWeight);
-            System.out.println("\tAdding " + (tempError * tempWeight) + " to " + error);
-            System.out.println("\t\tFor the HL node " + nodeIndex + " I will be multiplying: " +
-                    tempError + " and " + tempWeight + " to get: " + (tempError*tempWeight));
-            error += (tempError * tempWeight);
+  //          System.out.println("\tError of next layer: " + tempError);
+  //          System.out.println("\tWeight of node to that layer: " + tempWeight);
+  //          System.out.println("\tAdding " + (tempError * tempWeight) + " to " + sum);
+  //          System.out.println("\t\tFor the HL node " + nodeIndex + " I will be multiplying: " +
+   //                 tempError + " and " + tempWeight + " to get: " + (tempError*tempWeight));
+            sum += (tempError * tempWeight);
         }
-        System.out.println("\tThe resulting error is: " + error);
-        System.out.println();
+        
+   //     System.out.println("The error is " + error + "*" + sum);
+        error *= sum;
+   //     System.out.println("\tThe resulting error is: " + error);
+   //     System.out.println();
     }
     
     public double generateBiasWeight()
@@ -93,40 +99,19 @@ public class Node {
         double max = .3;
         double min = -.3;
         
-        return (min + (max - min) * rand.nextDouble());
+        return .1;
+        //return (min + (max - min) * rand.nextDouble());
     }
 
-    public void adjustTheWeights()
-    {
-        double tempWeight;
-        double newWeight;
-        
-        for(int i = 0; i < numberOfInputs; i++)
-        {
-            System.out.println("\tAdjusting the weights for node " + nodeIndex);
-            tempWeight = weightList.get(i);
-            System.out.println("\t\tCurrent weight: " + tempWeight);
-            System.out.println("\t\tLearning Constant" + learningConstant);
-            System.out.println("\t\tError" + error);
-            //System.out.println("\t\tNode output" + output);
-            System.out.println("\t\tValue over that weight: " + inputList.get(i));
-            
-            //this output needs to be the input from the PREVIOUS node.
-            //newWeight = tempWeight - (learningConstant * error * output);
-            //System.out.println("HERE:" + inputList.get(i));
-            newWeight = tempWeight - (learningConstant * error * inputList.get(i));
-            System.out.println("\t\t\tThe result is: " + newWeight);
-            weightList.set(i, newWeight);
-
-        }
-        System.out.println();
-        biasWeight = (biasWeight - (learningConstant * error * (-1)));
-        //outputDebugData();
-    }
-    
     public void generateWeights(int features)
     {
+ //       System.out.println("this is a test...");
+        //weightList.add(.2);
+        //weightList.add(-.1);
+        //weightList.add(.05);
+        //weightList.add(-.01);
         numberOfInputs = features;
+        //numberOfInputs = features;
         Random rand = new Random();
         double max = .3;
         double min = -.3;
@@ -137,6 +122,36 @@ public class Node {
             double theNum = min + (max - min) * rand.nextDouble();
             weightList.add(theNum);           
         }
+    }
+    
+    public void adjustTheWeights()
+    {
+        double tempWeight;
+        double newWeight;
+        
+        for(int i = 0; i < numberOfInputs; i++)
+        {
+//            System.out.println("\tAdjusting the weights for node " + nodeIndex);
+            tempWeight = weightList.get(i);
+//            System.out.println("\t\tCurrent weight: " + tempWeight);
+//        System.out.println("\t\tLearning Constant" + learningConstant);
+//           System.out.println("\t\tError" + error);
+            //System.out.println("\t\tNode output" + output);
+            //System.out.println("\t\tValue over that weight: " + inputList.get(i));
+            
+            //this output needs to be the input from the PREVIOUS node.
+
+        //    System.out.println("HERE:" + inputList.get(i));
+            newWeight = tempWeight - (learningConstant * error * inputList.get(i));
+       //     System.out.println("\t\t\tThe result is: " + newWeight);
+            weightList.set(i, newWeight);
+        //    System.out.println("The new weight is: " + newWeight + " TEST: " + weightList.get(i));
+            
+
+        }
+      //  System.out.println();
+        biasWeight = (biasWeight - (learningConstant * error * (-1)));
+        outputDebugData();
     }
     
     //This function sees if the node would fire
@@ -168,14 +183,14 @@ public class Node {
     
     public void outputDebugData()
     {
-        System.out.println("\tI am node " + nodeIndex + " and my current target value is: " 
-                + target);
-        System.out.println("\tMy weights are: ");
+    //    System.out.println("\tI am node " + nodeIndex + " and my current target value is: " 
+     //           + target);
+     //   System.out.println("\tMy weights are: ");
         for(int i = 0; i < numberOfInputs; i++)
         {
-            System.out.println("\t\tWeight " + i + ": " + weightList.get(i));
+     //       System.out.println("\t\tWeight " + i + ": " + weightList.get(i));
         }
-        System.out.println("\t\tMy bias weight is: " + biasWeight);
+     //   System.out.println("\t\tMy bias weight is: " + biasWeight);
         
     }
 
@@ -192,38 +207,44 @@ public class Node {
     *************************************************************/    
     public double fires(Instance inst)
     {       
-        double sum = 0;
-        
+        double sum = 0.0;
+    //    System.out.println("I am in fires inst. The number of inputs is " + numberOfInputs);
         for(int i = 0; i < numberOfInputs; i++)
         {
-            System.out.println("\tWe are adding (" + inst.value(i) + " * " + weightList.get(i) + ") to " + sum);
+    //        System.out.println("\tWe are adding (" + inst.value(i) + " * " + weightList.get(i) + ") to " + sum);
             sum += (inst.value(i) * weightList.get(i));
         }
         
         //lastly, we need to add the bias node.
-        System.out.println("\tWe are adding (" + biasInput + " * " + biasWeight + ") to " + sum);
+    //    System.out.println("\tWe are adding (" + biasInput + " * " + biasWeight + ") to " + sum);
         sum += (biasInput * biasWeight);
-        System.out.println("h = " + sum);
-        double result = 1 / (1 + Math.exp(sum * -1));
-        System.out.println("Final: " + result);
+        sum *= -1;
+   //     System.out.println("h = " + sum);
+        double result = 1 / (1 + Math.exp(sum));
+    //    System.out.println("Final: " + result);
+        output = result;
         return result;
     }
     
     public double fires(List input)
     {       
         double sum = 0;
-        
+    //    System.out.println("I am in fires list. The number of inputs is " + numberOfInputs);
+    //    System.out.println("The input I'm using is: " + input);
         for(int i = 0; i < numberOfInputs; i++)
         {
-            System.out.println("\t(OL) We are adding (" + input.get(i) + " * " + weightList.get(i) + ") to " + sum);
-            sum += (double) input.get(i) * weightList.get(i);
+    //        System.out.println("\t(OL) We are adding (" + input.get(i) + " * " + weightList.get(i) + ") to " + sum);
+            sum += (double) input.get(i) * (double) weightList.get(i);
         }
         
-        System.out.println("\t(OL) We are adding (" + biasInput + " * " + biasWeight + ") to " + sum);
+    //    System.out.println("\t(OL) We are adding (" + biasInput + " * " + biasWeight + ") to " + sum);
         sum += (biasInput * biasWeight);
-        System.out.println("h = " + sum);
-        double result = 1 / (1 + Math.exp(sum * -1));
-        System.out.println("Final: " + result);
+        sum *= -1;
+    //    System.out.println("h = " + sum);
+       
+        double result = 1 / (1 + Math.exp(sum));
+    //    System.out.println("Final: " + result);
+        output = result;
         return result;
     }
 }

@@ -122,8 +122,11 @@ public class RunClassifier {
         //the list of nodes for each layer should include n-1 items since
         //the output layer should have as many nodes as classes.
         ArrayList<Integer> nodeList = new ArrayList();
+        
+        //hidden layer 1
         nodeList.add(4);
 
+        //output layer
         nodeList.add(numClasses);
         
         System.out.println("I will want to be creating: " + numLayers + " layers.");
@@ -183,7 +186,7 @@ public class RunClassifier {
     public void classify(int trainSize, int testSize) throws Exception
     {
         //randomize the data
-        data.randomize(new Random(0));    
+        data.randomize(new Random(1));    
 
         //divide the data into training and testing groups.
         splitTrainAndTest(trainSize, testSize);

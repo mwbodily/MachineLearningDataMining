@@ -38,14 +38,14 @@ public class NeuralClassifier extends Classifier{
         //Create the network
         for(int i = 0; i < (numLayers - 1); i++)
         {
-            System.out.println("I am creating layer number " + i);
+         //   System.out.println("I am creating layer number " + i);
             //construct a layer, the target starts out as -1 since it's not set.
             Layer temp = new Layer((int) numNodes.get(i), numAttributes, false, -1);
             theLayers.add(temp);
         }
         //add the output layer. This should have as many nodes as there are classes.
         theLayers.add(new Layer((int) numNodes.get((numLayers - 1)), theLayers.get(numberOfLayers-2).numberOfNodes, true, -1));
-        System.out.println("We now have layers. As you can see.");
+        //System.out.println("We now have layers. As you can see.");
         //Output the layers, for debugging.
         //outputLayersForDebug();
 
@@ -71,8 +71,9 @@ public class NeuralClassifier extends Classifier{
 
         for(int i = 0; i < dataSet.numInstances(); i++)
         {            
-            System.out.println("Instance: " + dataSet.instance(i));
-            System.out.println("Checking..." + dataSet.instance(i).classValue());
+            //System.out.println("--------INSTANCE " + i + "------------------");
+            //System.out.println("Instance: " + dataSet.instance(i));
+            //System.out.println("Checking..." + dataSet.instance(i).classValue());
             //set up the outer layer to have the correct output.
             theLayers.get((numberOfLayers - 1)).setTarget(dataSet.instance(i).classValue());
             //outputLayersForDebug();
@@ -81,39 +82,46 @@ public class NeuralClassifier extends Classifier{
             {
                 if(k != 0)
                 {
+              //      System.out.println("Layer: " + k);
                     theLayers.get(k).trainWithList((theLayers.get(k-1).getOutputList()), theLayers.get(k-1).numberOfNodes);
+             //       System.out.println();
                 }
                 else
                 {
+            //        System.out.println("Layer: " + k);
                     theLayers.get(k).trainWithInstance(dataSet.instance(i));
+            //        System.out.println();
                 }
                 
             }
-            outputLayersForDebug();
+
+           // outputLayersForDebug();
             adjustNetwork();
-            System.out.println("END OF INSTANCE");
+
+            
 
         }
     }
     
     public void adjustNetwork()
     {
-        System.out.println("-----------Beginning back propogation-----------------");
+       // System.out.println("-----------Beginning back propogation-----------------");
         //find the error of each node starting from the output layer
         
-        System.out.println("Propogation for outer layer");
+        //System.out.println("Propogation for outer layer");
         theLayers.get((numberOfLayers - 1)).calculateOLErrors();
         
         for(int i = (numberOfLayers - 2); i >= 0; i--)
         {
-            System.out.println("Propogation for hidden layer" + i);
+          //  System.out.println("Propogation for hidden layer" + i);
             theLayers.get(i).calculateHLErrors(theLayers.get(i+1));
         }
         
-
-        for(int i = (numberOfLayers - 1); i <= 0; i--)
+        //System.out.println("----I am hereksdjfhaslkdjfhalskjdfhalksjdfhlaksjdhf-----");
+        //System.out.println("Num layers: " + numberOfLayers);
+        for(int i = (numberOfLayers - 1); i >= 0; i--)
         {
-            System.out.println("Weight adjustments for layer " + i);
+          //  System.out.println("Weight adjustments for layer " + i);
             theLayers.get(i).adjustWeights();
         }
 
@@ -121,22 +129,24 @@ public class NeuralClassifier extends Classifier{
     
     public double classifyAnInstance(Instance inst)
     {
-        System.out.println("I am classifying an instance: " + inst);
+        //System.out.println("I am classifying an instance: " + inst);
+        //System.out.println("Before we even start... Here's the output list:" + theLayers.get(numberOfLayers-1).getOutputList());
         for(int i = 0; i < (numberOfLayers); i++)
         {
             if(i != 0)
             {
-                System.out.println("Output Layers");
+          //      System.out.println("Output Layers");
                 theLayers.get(i).propogateList(theLayers.get(i-1).getOutputList());
-                outputLayersForDebug();
             }
             else
             {
-                System.out.println("Hidden Layers");
+          //      System.out.println("Hidden Layers");
                 theLayers.get(i).propogateInstance(inst);
             }
         }
-        return theLayers.get((numberOfLayers - 1)).classify();
+        //System.out.println("This is the output list that I'm going off of.");
+        //System.out.println(theLayers.get(numberOfLayers-1).getOutputList());
+        return theLayers.get((numberOfLayers-1)).classify();
     }
     /********************************************************************
      * Builds the classifier using the instances.
@@ -144,12 +154,12 @@ public class NeuralClassifier extends Classifier{
     @Override
     public void buildClassifier(Instances i) throws Exception {
         dataSet = i;
-        for(int it = 0; it < 3; it++)
+        for(int it = 0; it < 3000; it++)
         {
             trainNetwork();
             dataSet.randomize(new Random(1));
             //outputLayersForDebug();
-            System.out.println("------------------------------------------------------------------------------------here " + it);
+            //System.out.println("------------------------------------------------------------------------------------here " + it);
         }
 
     }
@@ -160,6 +170,7 @@ public class NeuralClassifier extends Classifier{
     @Override
     public double classifyInstance(Instance inst) throws Exception
     {
+        System.out.println(classifyAnInstance(inst));
         return classifyAnInstance(inst);
     }
 }

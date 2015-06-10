@@ -20,29 +20,27 @@ public class Layer {
         double learningConstant;
         Boolean isOutput;
         double target;
-        List<Double> nodeOutputs;
         
         public Layer(int numNodes, int numFeatures, Boolean out, double t)
         {
-            System.out.println("I am being created with " + numNodes + "nodes.");
+         //   System.out.println("I am being created with " + numNodes + "nodes.");
             Nodes = new ArrayList();
-            nodeOutputs = new ArrayList();
             numberOfNodes = numNodes;
             numberOfFeatures = numFeatures;
             learningConstant = .1;
             target = t;
             isOutput = out;
             instantiateNodes();
-            instantiateNodeOutputs();
+            //instantiateNodeOutputs();
         }
         
-        public void instantiateNodeOutputs()
+        /*public void instantiateNodeOutputs()
         {
             for(int i = 0; i < numberOfNodes; i++)
             {
                 nodeOutputs.add(0.0);
             }
-        }
+        }*/
         
         public void calculateOLErrors()
         {
@@ -62,6 +60,7 @@ public class Layer {
         
         public void adjustWeights()
         {
+        //    System.out.println("I am here... In adjust weights layer version. " + numberOfNodes);
             for(int i = 0; i < numberOfNodes; i++)
             {
                 Nodes.get(i).adjustTheWeights();
@@ -90,6 +89,7 @@ public class Layer {
                 Nodes.get(i).outputDebugData();
             }
             
+            List nodeOutputs = getOutputList();
             if(nodeOutputs.isEmpty())
             {
                 System.out.println("\t\tAs of yet, I have no outputs.");
@@ -112,7 +112,7 @@ public class Layer {
             for(int i = 0; i < numberOfNodes; i++)
             {
                 double result = Nodes.get(i).trainOnInstance(inst);
-                nodeOutputs.set(i, result);
+                //nodeOutputs.set(i, result);
             }
         }
         
@@ -121,7 +121,7 @@ public class Layer {
             for(int i = 0; i < numberOfNodes; i++)
             {
                 double result = Nodes.get(i).trainOnList(inputList, items);
-                nodeOutputs.set(i, result);
+                //nodeOutputs.set(i, result);
             }
         }
         
@@ -129,7 +129,14 @@ public class Layer {
         //a list to serve as inputs to the next layer.
         public List getOutputList()
         {            
-            return nodeOutputs;
+            List<Double> outputList = new ArrayList();
+            for(int i = 0; i < numberOfNodes; i++)
+            {
+                outputList.add(Nodes.get(i).output);
+            
+            }
+            
+            return outputList;
         }
         
         //sets the target of the layer and each node to the class value of
@@ -140,7 +147,7 @@ public class Layer {
             
             for(int i = 0; i < numberOfNodes; i++)
             {
-                if(Nodes.get(i).nodeIndex == targ)
+                if(Nodes.get(i).nodeIndex == (int) targ)
                 {
                     Nodes.get(i).target = 1.0;
                 }
@@ -156,7 +163,8 @@ public class Layer {
             for(int i = 0; i < numberOfNodes; i++)
             {
                 double result = Nodes.get(i).fires(inputList);
-                nodeOutputs.set(i, result);
+        //        System.out.println("Your result is: " + result);
+                //nodeOutputs.set(i, result);
             }
         }
         
@@ -165,24 +173,29 @@ public class Layer {
             for(int i = 0; i < numberOfNodes; i++)
             {
                 double result = Nodes.get(i).fires(inst);
-                nodeOutputs.set(i, result);
+                
+                //nodeOutputs.set(i, result);
             }
         }
         
         public double classify()
         {
+        //    System.out.println("---------I am in classify------------");
             double max = Double.NEGATIVE_INFINITY;
             int indexOfMax = -1;
             
             for(int i = 0; i < numberOfNodes; i++)
             {
+         //       System.out.println("This is the for loop iteration " + i);
                 if(Nodes.get(i).output > max)
                 {
+         //           System.out.println("Found a better value. " + max + 
+         //                   " was replaced with " + Nodes.get(i).output);
                     max = Nodes.get(i).output;
                     indexOfMax = i;
                 }
             }
-            System.out.println(indexOfMax + " asdf");
+       //     System.out.println("-----------" + indexOfMax + " asdf----------");
             return indexOfMax;
         }
 }
