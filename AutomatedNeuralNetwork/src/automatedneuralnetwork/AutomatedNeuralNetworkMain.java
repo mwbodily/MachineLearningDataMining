@@ -20,7 +20,7 @@ public class AutomatedNeuralNetworkMain {
             //RunClassifier kNN = new RunClassifier();
             
             //Runs with the cars data set.            
-            RunClassifier ANN = new RunClassifier("IrisCSV.csv");
+            RunClassifier ANN = new RunClassifier("diabetes.csv");
             //RunClassifier ANN = new RunClassifier("trialCSV.csv");
             ANN.classify();
             ANN.outputResults();

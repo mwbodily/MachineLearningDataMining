@@ -124,12 +124,12 @@ public class RunClassifier {
         ArrayList<Integer> nodeList = new ArrayList();
         
         //hidden layer 1
-        nodeList.add(4);
+        nodeList.add(8);
 
         //output layer
         nodeList.add(numClasses);
         
-        System.out.println("I will want to be creating: " + numLayers + " layers.");
+        //System.out.println("I will want to be creating: " + numLayers + " layers.");
         
         NeuralClassifier classy = new NeuralClassifier(numLayers, numAttributes, nodeList, numClasses);
         classy.buildClassifier(training);

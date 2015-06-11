@@ -154,12 +154,10 @@ public class NeuralClassifier extends Classifier{
     @Override
     public void buildClassifier(Instances i) throws Exception {
         dataSet = i;
-        for(int it = 0; it < 3000; it++)
+        for(int it = 0; it < 3; it++)
         {
             trainNetwork();
             dataSet.randomize(new Random(1));
-            //outputLayersForDebug();
-            //System.out.println("------------------------------------------------------------------------------------here " + it);
         }
 
     }
