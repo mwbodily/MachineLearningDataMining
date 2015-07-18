@@ -21,7 +21,6 @@ public class RunClassifier {
     private final Instances data;
     private Instances training;
     private Instances testing;
-    private Instances validation; //not currently used, to be used in the future
     private Evaluation trainingEval;
     private int numLayers;
     
@@ -33,7 +32,7 @@ public class RunClassifier {
     ********************************************************************/
     public RunClassifier() throws Exception
     {
-        numLayers = 2;
+        numLayers = 3;
         //get the data. Note: this file must exist in the top level folder.
         source = new DataSource("IrisCSV.csv");
         data = source.getDataSet();
@@ -54,7 +53,7 @@ public class RunClassifier {
      ********************************************************************/
     public RunClassifier(String fileName) throws Exception
     {
-        numLayers = 2;
+        numLayers = 3;
         source = new DataSource(fileName);
         data = source.getDataSet();
         
@@ -125,11 +124,12 @@ public class RunClassifier {
         
         //hidden layer 1
         nodeList.add(8);
+        
+        //hidden layer 2
+        nodeList.add(4);
 
         //output layer
         nodeList.add(numClasses);
-        
-        //System.out.println("I will want to be creating: " + numLayers + " layers.");
         
         NeuralClassifier classy = new NeuralClassifier(numLayers, numAttributes, nodeList, numClasses);
         classy.buildClassifier(training);

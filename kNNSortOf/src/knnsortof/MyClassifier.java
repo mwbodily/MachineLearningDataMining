@@ -1,7 +1,7 @@
 /*
  * Contains all the functions needed to run for a VERY basic classifier
  */
-package automatedneuralnetwork;
+package knnsortof;
 
 import weka.classifiers.*;
 import weka.core.*;
